@@ -1,0 +1,1195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wrenfield Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* A fictional library catalogue. With no change classes on <html> it renders the stable build;
+   each catalogued change adds one class (c01 … c17), and the review tray removes one to preview "without". */
+:root {
+  --st-ink: #222222; --st-link: #1a4f9c; --st-bar: #2d3e50; --st-rule: #c8cdd2; --st-th: #e4e8ec; --st-zebra: #f4f5f6;
+  --ink: #1b2733; --muted: #5b6875; --paper: #f6f7f9; --card: #ffffff; --line: #dde2e7;
+  --primary: #2b59c3; --primary-ink: #ffffff; --primary-soft: #e8eefb;
+  --ok: #17734a; --ok-bg: #e2f3ea; --wait: #8a5300; --wait-bg: #fcefd6; --out: #55606b; --out-bg: #eceff2;
+  --rv-hl: #f0a81c; --rv-hl-soft: rgba(240, 168, 28, .16); --rv-ink: #1d2630; --rv-muted: #66717c; --rv-line: #e2e6ea; --rv-bg: #ffffff;
+  --rv-keep: #1c7c50; --rv-drop: #c0412c; --rv-und: #2f3a45;
+  --f-ui: "Public Sans", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-serif: "Newsreader", Charter, "Iowan Old Style", Georgia, serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --f-old: Verdana, Geneva, Tahoma, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font: 13px/1.45 var(--f-old); color: var(--st-ink); background: #ffffff; }
+a { color: var(--st-link); }
+button, input, textarea { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.c01 body { background: var(--paper); color: var(--ink); }
+.c01 a { color: var(--primary); }
+.c02 body { font: 16px/1.55 var(--f-ui); }
+
+/* Build bar */
+.buildbar { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 7px 16px; font: 600 11px/1.3 var(--f-mono); letter-spacing: .05em; text-transform: uppercase; background: #e4e7ea; color: #4a545e; }
+.buildbar.rd { background: #1d2630; color: #dfe6ec; }
+.buildbar span + span::before { content: "·"; margin-right: 14px; opacity: .6; }
+.buildbar .wo { color: var(--rv-hl); }
+.buildbar .dr { color: #f4a493; }
+.buildbar .switch { margin-left: auto; color: inherit; }
+
+/* Header */
+.site-head { background: var(--st-bar); color: #ffffff; }
+.head-in { max-width: 1100px; margin: 0 auto; padding: 10px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; }
+.brand-mark { display: none; }
+.nav { display: flex; gap: 16px; }
+.nav a { color: #cfe0f5; font-size: 12px; }
+.head-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.open-now { display: none; }
+.hsearch { display: flex; gap: 4px; }
+.hsearch input { width: 170px; padding: 3px 6px; font-size: 12px; border: 1px solid #8a99a8; background: #ffffff; color: #222222; }
+.hsearch button { padding: 2px 9px; font-size: 12px; color: #222222; }
+.icon-btn { display: inline-grid; place-items: center; width: 32px; height: 32px; padding: 0; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .45); background: transparent; color: inherit; cursor: pointer; }
+.icon-btn svg { width: 17px; height: 17px; }
+.c01 .site-head { background: var(--card); color: var(--ink); border-bottom: 1px solid var(--line); }
+.c01 .head-in { padding-block: 14px; }
+.c01 .brand { color: var(--ink); text-transform: none; letter-spacing: 0; font-size: 17px; }
+.c01 .brand-mark { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; background: var(--ink); color: var(--paper); font: 600 21px/1 var(--f-serif); }
+.c01 .nav a { color: var(--ink); font-size: 14px; font-weight: 500; text-decoration: none; }
+.c01 .nav a.cur { color: var(--primary); box-shadow: inset 0 -2px 0 var(--primary); padding-bottom: 4px; }
+.c01 .icon-btn { border-color: var(--line); }
+.c02 .brand { font-family: var(--f-serif); font-weight: 600; font-size: 22px; }
+.c03 .hsearch { display: none; }
+.c10 .open-now { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: var(--ok); }
+.c10 .open-now::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+/* Catalogue */
+.wrap { max-width: 1100px; margin: 0 auto; padding: 16px 20px 40px; }
+.c01 .wrap { padding-top: 26px; }
+.pg-title { margin: 4px 0; padding-bottom: 4px; font-size: 16px; color: var(--st-bar); border-bottom: 1px solid var(--st-rule); }
+.adv { margin: 0 0 14px; font-size: 12px; }
+.c03 .pg-title, .c03 .adv { display: none; }
+.hero { display: none; }
+.c03 .hero { display: grid; gap: 14px; padding: 6px 0 24px; }
+.hero h1 { margin: 0; font-size: 22px; }
+.c02 .hero h1 { font-family: var(--f-serif); font-weight: 600; font-size: 42px; line-height: 1.08; letter-spacing: -.01em; }
+.bigsearch { display: flex; align-items: center; max-width: 640px; padding: 4px 4px 4px 16px; background: #ffffff; border: 1px solid #b6c0ca; border-radius: 10px; }
+.c01 .bigsearch { border-color: var(--line); box-shadow: 0 1px 2px rgba(20, 30, 40, .06); }
+.bigsearch:focus-within { outline: 2px solid var(--primary); outline-offset: 1px; }
+.bigsearch input { flex: 1; min-width: 0; padding: 10px 0; border: 0; outline: none; background: transparent; font-size: 18px; }
+.bigsearch .icon-btn { width: 44px; height: 44px; border: 0; border-radius: 8px; background: var(--st-bar); color: #ffffff; }
+.c01 .bigsearch .icon-btn { background: var(--primary); }
+.chips { display: none; }
+.c07 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 14px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #ffffff; }
+.res-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; margin: 0 0 10px; }
+.res-h { margin: 0; font-size: 13px; }
+.c02 .res-h { font-family: var(--f-serif); font-weight: 600; font-size: 24px; }
+.sort { font-size: 12px; color: #555555; }
+.c01 .sort { color: var(--muted); }
+.c02 .sort { font-size: 14px; }
+.tscroll { overflow-x: auto; }
+.rtable { width: 100%; border-collapse: collapse; font-size: 12px; background: #ffffff; }
+.rtable th { text-align: left; padding: 6px 8px; background: var(--st-th); border: 1px solid var(--st-rule); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+.rtable td { padding: 6px 8px; border: 1px solid var(--st-rule); vertical-align: top; }
+.rtable tbody tr:nth-child(even) td { background: var(--st-zebra); }
+.c01 .rtable th { background: #eef1f4; color: var(--muted); border-color: var(--line); }
+.c01 .rtable td { border-color: var(--line); }
+.c02 .rtable { font-size: 14px; }
+.c06 .tscroll { display: none; }
+.cards { display: none; }
+.c06 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.card { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; align-items: start; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.cover-link { display: block; }
+.card-body { display: grid; gap: 4px; min-width: 0; }
+.card-t { margin: 0; font-size: 14px; line-height: 1.25; }
+.c02 .card-t { font-family: var(--f-serif); font-weight: 600; font-size: 20px; }
+.card-t a { color: inherit; text-decoration: none; }
+.card-t a:hover { text-decoration: underline; }
+.card-meta { margin: 0; color: var(--muted); font-size: 13px; }
+.card-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-height: 26px; }
+.hold-row { margin-top: 6px; }
+.st-old { font-weight: 700; }
+.st-new { display: none; }
+.c04 .st-old, .c04 .lbl-old { display: none; }
+.c04 .st-new { display: inline-flex; }
+.badge { align-items: center; gap: 6px; padding: 3px 10px 3px 8px; border-radius: 999px; font-weight: 600; font-size: 12.5px; line-height: 1.4; white-space: nowrap; }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.wait { color: var(--wait); background: var(--wait-bg); }
+.badge.out { color: var(--out); background: var(--out-bg); }
+.due { font-size: 12px; }
+.c02 .due { font-size: 13.5px; color: var(--muted); }
+.d-new { display: none; }
+.c08 .d-old { display: none; }
+.c08 .d-new { display: inline; }
+.hold-old { padding: 0; border: 0; background: none; color: var(--st-link); font-size: 12px; text-decoration: underline; cursor: pointer; }
+.hold-new { display: none; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border: 0; border-radius: 8px; background: var(--st-bar); color: #ffffff; font-weight: 600; font-size: 14px; line-height: 1.2; cursor: pointer; }
+.c01 .hold-new { background: var(--primary); color: var(--primary-ink); }
+.c05 .hold-old { display: none; }
+.c05 .hold-new { display: inline-flex; }
+.hold-new.placed { background: var(--ok); cursor: default; }
+.pager { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 16px; font-size: 12px; color: #555555; }
+.c01 .pager { color: var(--muted); }
+.c02 .pager { font-size: 14px; }
+.events { display: none; }
+.c09 .events { display: grid; gap: 12px; margin-top: 34px; }
+.sec-h { margin: 0; font-size: 14px; }
+.c02 .sec-h { font-family: var(--f-serif); font-weight: 600; font-size: 24px; }
+.ev-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.ev { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 12px; align-items: center; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.ev-date { display: grid; justify-items: center; padding: 6px 0; border-radius: 8px; background: var(--primary-soft); color: var(--primary); line-height: 1.1; }
+.ev-date b { font-size: 21px; }
+.ev-date span { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.ev-t { font-weight: 600; }
+.ev-m { color: var(--muted); font-size: 13px; }
+
+/* Book page */
+.back { display: inline-block; margin-bottom: 14px; font-size: 12px; }
+.c02 .back { font-size: 14px; }
+.book { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: start; }
+.c11 .book { grid-template-columns: 220px minmax(0, 1fr); gap: 36px; }
+.book-info { min-width: 0; }
+.book-title { margin: 0; font-size: 16px; color: var(--st-bar); }
+.c01 .book-title { color: var(--ink); }
+.c02 .book-title { font-family: var(--f-serif); font-weight: 600; font-size: 42px; line-height: 1.08; }
+.byline { margin: 2px 0 8px; }
+.c02 .byline { font-size: 18px; color: var(--muted); }
+.facts { margin: 0 0 8px; }
+.facts div, .facts dt, .facts dd { display: inline; margin: 0; }
+.facts dt::after { content: ": "; }
+.facts div::after { content: ". "; }
+.c11 .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px 24px; margin: 18px 0; padding: 16px 0; border-block: 1px solid var(--line); }
+.c11 .facts div { display: grid; gap: 2px; }
+.c11 .facts div::after, .c11 .facts dt::after { content: none; }
+.c11 .facts dt { display: block; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.c11 .facts dd { display: block; }
+.hold-wrap { width: fit-content; }
+.avail-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 12px; }
+.queue { display: none; }
+.c12 .queue { display: block; max-width: 540px; margin: 0 0 16px; padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--wait); border-radius: 8px; font-size: 15px; }
+.more { display: none; }
+.c13 .more { display: grid; gap: 14px; margin-top: 40px; }
+.more-row { display: flex; flex-wrap: wrap; gap: 18px; }
+.more-item { display: grid; gap: 8px; width: 116px; font-size: 13px; line-height: 1.3; }
+.desc { display: grid; gap: 8px; max-width: 660px; margin-top: 28px; }
+.desc p { margin: 0; }
+
+/* Generated covers */
+.cover { container-type: inline-size; position: relative; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 2px 5px 5px 2px; background: var(--c1); color: var(--c2); box-shadow: inset 5px 0 0 rgba(0, 0, 0, .18), 0 1px 3px rgba(20, 30, 40, .25); }
+.cv { position: absolute; inset: 0; display: grid; align-content: space-between; padding: 14cqi 11cqi 12cqi 15cqi; }
+.cv::before { content: ""; position: absolute; left: 15cqi; right: 11cqi; top: 50%; border-top: 1px solid currentColor; opacity: .45; }
+.cv-t { font-family: var(--f-serif); font-weight: 600; font-size: 11.5cqi; line-height: 1.08; hyphens: auto; overflow-wrap: break-word; }
+.cv-a { font-family: var(--f-ui); font-size: 7.5cqi; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+
+.reload-msg { margin: 0 0 12px; padding: 8px 12px; background: #fff6cc; border: 1px solid #e0c95a; font-size: 12px; }
+.toast { position: fixed; z-index: 80; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 12px 18px; border-radius: 10px; background: var(--ink); color: #ffffff; font: 500 14px/1.4 var(--f-ui); box-shadow: 0 10px 28px rgba(16, 24, 32, .3); }
+.foot { border-top: 1px solid var(--st-rule); }
+.foot-in { display: grid; gap: 4px; max-width: 1100px; margin: 0 auto; padding: 14px 20px 28px; font-size: 11px; color: #666666; }
+.c01 .foot { background: var(--card); border-color: var(--line); }
+.c01 .foot-in { color: var(--muted); font-size: 13px; }
+
+/* Review tooling (preview build only) */
+.rv-on { outline: 3px solid var(--rv-hl) !important; outline-offset: 4px; border-radius: 6px; box-shadow: 0 0 0 10px var(--rv-hl-soft); }
+.rv { position: fixed; z-index: 60; top: 12px; right: 12px; bottom: 70px; width: 388px; display: flex; flex-direction: column; overflow: hidden; background: var(--rv-bg); color: var(--rv-ink); border: 1px solid var(--rv-line); border-radius: 14px; box-shadow: 0 18px 44px rgba(16, 24, 32, .2); font: 13.5px/1.45 var(--f-ui); }
+.rv-head { display: grid; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--rv-line); }
+.rv-row1 { display: flex; align-items: center; gap: 6px; }
+.rv-brand { margin-right: auto; font: 600 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rv-muted); }
+.rv-nav { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 6px; }
+.rv-count { text-align: center; font-size: 13px; font-weight: 600; }
+.rv-sumhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 600; }
+.rv-btn { padding: 5px 12px; border: 1px solid var(--rv-line); border-radius: 999px; background: #ffffff; color: var(--rv-ink); font-size: 12.5px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.rv-btn:hover { border-color: #c4ccd3; }
+.rv-btn[aria-pressed="true"] { background: var(--rv-und); border-color: var(--rv-und); color: #ffffff; }
+.rv-body { flex: 1; min-height: 0; overflow: auto; display: grid; grid-auto-rows: max-content; align-content: start; gap: 10px; padding: 14px 14px 18px; }
+.rv-body > * { margin: 0; }
+.rv-eyebrow { font: 600 11px/1.3 var(--f-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--rv-muted); }
+.rv-eyebrow .live { color: var(--rv-keep); }
+.rv-eyebrow .np { color: #9a6a00; }
+.rv-title { font-size: 17px; font-weight: 700; line-height: 1.3; }
+.rv-small { font-size: 12px; color: var(--rv-muted); }
+.rv-mono { font-family: var(--f-mono); font-size: .92em; }
+.rv-switch { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--rv-line); border-radius: 10px; font-weight: 600; cursor: pointer; }
+.rv-switch.on { border-color: var(--rv-hl); background: #fff8e8; }
+.rv-switch input { appearance: none; flex: none; position: relative; width: 34px; height: 20px; margin: 0; border-radius: 999px; background: #c9d0d6; cursor: pointer; transition: background .15s; }
+.rv-switch input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform .15s; }
+.rv-switch input:checked { background: var(--rv-hl); }
+.rv-switch input:checked::after { transform: translateX(14px); }
+.rv-diff { border: 1px solid var(--rv-line); border-radius: 10px; overflow: clip; }
+.rv-diff summary { display: flex; align-items: center; gap: 8px; padding: 9px 12px; cursor: pointer; font-weight: 600; list-style: none; }
+.rv-diff summary::-webkit-details-marker { display: none; }
+.rv-diff summary::before { content: "▸"; color: var(--rv-muted); font-size: 11px; transition: transform .15s; }
+.rv-diff[open] summary::before { transform: rotate(90deg); }
+.rv-diff summary:hover { background: #f6f8fa; }
+.rv-diff-t { margin-right: auto; }
+.rv-diff-s { font: 500 11.5px/1 var(--f-mono); color: var(--rv-muted); }
+.rv-diff-s .add, .rv-new { color: #1a7f37; }
+.rv-diff-s .del { color: #cf222e; }
+.rv-file { border-top: 1px solid var(--rv-line); }
+.rv-file-h { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; background: #f6f8fa; font: 600 11px/1.4 var(--f-mono); color: var(--rv-ink); overflow-wrap: anywhere; }
+.rv-new { flex: none; font-weight: 500; }
+.rv-code { margin: 0; overflow-x: auto; background: #ffffff; font: 11px/1.55 var(--f-mono); }
+.rv-code-in { display: inline-block; min-width: 100%; padding: 2px 0 4px; }
+.ln { display: block; padding: 0 10px; white-space: pre; color: #57606a; }
+.ln.add { background: #e6ffec; color: #116329; }
+.ln.del { background: #ffebe9; color: #82071e; }
+.ln.hunk { background: #ddf4ff; color: #57606a; }
+.rv-dropped { padding: 10px 12px; border: 1px solid #f1c4bb; border-radius: 10px; background: #fdf0ed; color: #7a2516; font-size: 13px; }
+.rv-callout { padding: 10px 12px; border: 1px solid #f0d68f; border-radius: 10px; background: #fdf3d6; color: #5a4300; font-size: 13px; }
+.rv-warn { color: var(--rv-drop); font-size: 12.5px; font-weight: 600; }
+.rv-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.rv-seg button { padding: 8px 6px; border: 1px solid var(--rv-line); border-radius: 999px; background: #ffffff; font-size: 13px; font-weight: 600; cursor: pointer; }
+.rv-seg .k[aria-pressed="true"] { background: var(--rv-keep); border-color: var(--rv-keep); color: #ffffff; }
+.rv-seg .d[aria-pressed="true"] { background: var(--rv-drop); border-color: var(--rv-drop); color: #ffffff; }
+.rv-seg .u[aria-pressed="true"] { background: var(--rv-und); border-color: var(--rv-und); color: #ffffff; }
+.rv-label { font-size: 12.5px; font-weight: 600; }
+.rv-note { width: 100%; min-height: 54px; padding: 8px 10px; resize: vertical; border: 1px solid var(--rv-line); border-radius: 8px; background: #ffffff; }
+.rv-noterow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.rv-saved { color: var(--rv-keep); font-size: 12px; font-weight: 600; }
+.rv-list { list-style: none; padding: 12px 0 0; border-top: 1px solid var(--rv-line); display: grid; gap: 6px; }
+.rv-row { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 10px; align-items: start; width: 100%; padding: 8px 10px; text-align: left; background: #ffffff; border: 1px solid var(--rv-line); border-radius: 9px; cursor: pointer; }
+.rv-row:hover { border-color: #c4ccd3; }
+.rv-row[aria-current="true"] { border-color: var(--rv-hl); box-shadow: 0 0 0 1px var(--rv-hl); background: #fffaf0; }
+.rv-chip { justify-self: start; padding: 3px 7px; border-radius: 999px; background: #eceff2; color: var(--rv-muted); font: 600 10.5px/1.2 var(--f-mono); }
+.rv-chip.keep { background: #e1f2e9; color: var(--rv-keep); }
+.rv-chip.drop { background: #fbe5e0; color: var(--rv-drop); }
+.rv-row-t { font-size: 12.5px; line-height: 1.35; }
+.rv-row-t b { margin-right: 4px; font: 600 11.5px/1.35 var(--f-mono); }
+.rv-tally { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.rv-tally div { display: grid; gap: 2px; padding: 10px 12px; border: 1px solid var(--rv-line); border-radius: 10px; font-size: 12px; color: var(--rv-muted); }
+.rv-tally b { font-size: 24px; line-height: 1.1; color: var(--rv-ink); font-variant-numeric: tabular-nums; }
+.rv-tally .t-keep b { color: var(--rv-keep); }
+.rv-tally .t-drop b { color: var(--rv-drop); }
+.rv-h { font-size: 14px; font-weight: 700; padding-top: 4px; }
+.rv-plan { list-style: none; padding: 0; counter-reset: step; display: grid; }
+.rv-plan li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 6px; padding: 5px 0; border-bottom: 1px dashed var(--rv-line); font-size: 12.5px; line-height: 1.35; }
+.rv-plan li::before { counter-increment: step; content: counter(step); color: var(--rv-muted); font: 600 11px/1.6 var(--f-mono); }
+.rv-plan li.base::before { content: "↳"; counter-increment: none; }
+.rv-plan li.gate::before { content: "✓"; counter-increment: none; color: var(--rv-keep); }
+.rv-plan li.base, .rv-plan li.gate { font-weight: 600; }
+.rv-plan em { font-style: normal; color: var(--rv-muted); font-size: 11.5px; white-space: nowrap; }
+.rv-out { list-style: none; padding: 0; display: grid; gap: 6px; font-size: 12.5px; }
+.rv-out li { display: grid; gap: 2px; padding: 8px 10px; border: 1px solid var(--rv-line); border-left: 3px solid var(--rv-drop); border-radius: 8px; }
+.rv-outnote { color: var(--rv-muted); font-size: 12px; }
+.rv-json { max-height: 220px; overflow: auto; padding: 10px 12px; border-radius: 8px; background: #f2f4f6; font: 11px/1.5 var(--f-mono); white-space: pre; }
+.rv-pill { position: fixed; z-index: 61; right: 12px; bottom: 14px; display: inline-flex; align-items: center; gap: 10px; padding: 10px 14px 10px 18px; border: 0; border-radius: 999px; background: var(--rv-und); color: #ffffff; font: 600 13.5px/1 var(--f-ui); box-shadow: 0 8px 22px rgba(16, 24, 32, .28); cursor: pointer; }
+.rv-pill span { padding: 4px 9px; border-radius: 999px; background: var(--rv-hl); color: #2a1d00; font-size: 12px; }
+
+@media (min-width: 1100px) { html.rv-open body { padding-right: 412px; } }
+@media (max-width: 1099px) { .rv { top: auto; left: 12px; right: 12px; width: auto; height: min(60vh, 520px); } }
+@media (max-width: 640px) {
+  .c11 .book { grid-template-columns: minmax(0, 1fr); }
+  .c11 .book-cover { max-width: 200px; }
+  .c02 .hero h1, .c02 .book-title { font-size: 32px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="buildbar" id="buildbar"></div>
+<header class="site-head" id="site-head" data-ch="C-001"></header>
+<main class="wrap" id="main"></main>
+<footer class="foot" data-ch="C-001">
+  <div class="foot-in">
+    <span>Hours: Mon–Thu 09:00–20:00 · Fri–Sat 09:00–17:00 · Sun closed</span>
+    <span>Wrenfield Library is fictional. This demo of line-item review was built with Claude Opus 5.5.</span>
+  </div>
+</footer>
+<aside class="rv" id="rv" aria-label="Change review" hidden></aside>
+<button type="button" class="rv-pill" id="rv-pill" hidden></button>
+<div class="toast" id="toast" role="status" hidden></div>
+<script type="text/plain" id="diffs">
+=== C-001
+--- src/styles/tokens.css @1,1
+ :root {
+-  --header-bg: #2d3e50;
+-  --header-ink: #ffffff;
+-  --link: #1a4f9c;
++  --ink: #1b2733;
++  --paper: #f6f7f9;
++  --line: #dde2e7;
++  --primary: #2b59c3;
++  --header-bg: #ffffff;
++  --header-ink: var(--ink);
++  --link: var(--primary);
+ }
+--- src/components/SiteHeader.tsx @15,15 SiteHeader()
+     <header className="site-head">
+       <a className="brand" href="/">
+-        WRENFIELD LIBRARY
++        <span className="mark">W</span>
++        Wrenfield Library
+       </a>
+=== C-002
+--- src/styles/type.css @1,1
+-body { font: 13px/1.45 Verdana, sans-serif; }
+-h1, h2, h3 { font: bold 16px Verdana; }
++body { font: 16px/1.55 "Public Sans"; }
++h1, h2, h3 {
++  font-family: "Newsreader", serif;
++  font-weight: 600;
++}
++h1 { font-size: 42px; line-height: 1.08; }
++h2 { font-size: 24px; }
+=== C-003
+--- src/pages/Catalogue.tsx @21,21 Catalogue()
+     <main className="wrap">
+-      <h3 className="pg-title">
+-        Catalogue search
+-      </h3>
+-      <p>Search: <b>{q}</b> · <Advanced /></p>
++      <section className="hero">
++        <h1>Find your next book</h1>
++        <SearchBox big defaultValue={q} />
++      </section>
+       <ResultsHeading total={total} q={q} />
+--- src/components/SiteHeader.tsx @24,26 SiteHeader()
+       <div className="head-right">
+-        <SearchBox />
+         <AccountButton />
+       </div>
+=== C-004
+--- src/components/Availability.tsx @4,4
+ export function Availability({ item }) {
+   const n = item.holds;
+-  const code = item.out ? 'OUT' : 'IN';
+-  const h = n ? ` (${n} HLD)` : '';
+-  return <b>{code + h}</b>;
++  if (!item.out) {
++    return <Badge tone="ok">Available</Badge>;
++  }
++  const tone = n ? 'wait' : 'out';
++  const holds = n ? plural(n, 'hold') : null;
++  return (
++    <Badge tone={tone}>
++      Checked out{holds && ` · ${holds}`}
++    </Badge>
++  );
+ }
+=== C-005
+--- src/components/HoldButton.tsx @6,6 HoldButton({ item })
+   return (
+-    <a className="hold" href={holdUrl(item)}>
+-      Hold
+-    </a>
++    <form method="post" action={holdUrl(item)}>
++      <button className="btn btn-primary">
++        Place hold
++      </button>
++    </form>
+   );
+--- src/styles/buttons.css @0,1
++.btn {
++  padding: 8px 16px;
++  border: 0;
++  border-radius: 8px;
++  font-weight: 600;
++}
++.btn-primary {
++  background: var(--primary);
++  color: #fff;
++}
+=== C-006
+--- src/pages/Catalogue.tsx @27,32 Catalogue()
+       <ResultsHeading total={total} q={q} />
+-      <ResultsTable items={items} />
++      <div className="cards">
++        {items.map((it) => (
++          <ResultCard key={it.id} item={it} />
++        ))}
++      </div>
+       <Pager page={page} pages={pages} />
+--- src/components/ResultCard.tsx @0,1
++export function ResultCard({ item }) {
++  return (
++    <article className="card">
++      <Cover item={item} />
++      <div className="card-body">
++        <h3>
++          <a href={urlFor(item)}>{item.title}</a>
++        </h3>
++        <p>{item.author} · {item.year}</p>
++        <Availability item={item} />
++        <DueDate item={item} />
++        <HoldButton item={item} />
++      </div>
++    </article>
++  );
++}
+=== C-007
+--- src/components/FormatChips.tsx @0,1
++const FORMATS = [
++  'All', 'Book', 'eBook', 'Audiobook',
++];
++
++export function FormatChips({ value, onPick }) {
++  return (
++    <div className="chips" role="group">
++      {FORMATS.map((f) => (
++        <button key={f} className="chip"
++          aria-pressed={value === f}
++          onClick={() => onPick(f)}>
++          {f === 'All' ? 'All formats' : f}
++        </button>
++      ))}
++    </div>
++  );
++}
+--- src/pages/Catalogue.tsx @24,24 Catalogue()
+         <SearchBox big defaultValue={q} />
++        <FormatChips
++          value={format}
++          onPick={setFormat}
++        />
+       </section>
+=== C-008
+--- src/lib/dates.ts @1,1
+-export const formatDue = (d: string) => d;
++const md = new Intl.DateTimeFormat('en-US', {
++  month: 'short',
++  day: 'numeric',
++});
++
++export function formatDue(d: string) {
++  // Noon, so the day can't shift by time zone.
++  const day = new Date(d + 'T12:00');
++  return 'Due back ' + md.format(day);
++}
+=== C-009
+--- src/components/EventsStrip.tsx @0,1
++export function EventsStrip() {
++  const events = useUpcomingEvents({ limit: 3 });
++  if (!events.length) return null;
++  return (
++    <section className="events">
++      <h2>This week at Wrenfield</h2>
++      <div className="ev-list">
++        {events.map((e) => (
++          <EventCard key={e.id} event={e} />
++        ))}
++      </div>
++    </section>
++  );
++}
+--- src/pages/Catalogue.tsx @34,39 Catalogue()
+       <Pager page={page} pages={pages} />
++      <EventsStrip />
+     </main>
+=== C-010
+--- src/components/OpenNow.tsx @0,1
++export function OpenNow() {
++  const { open, until } = useOpeningHours();
++  if (!open) return null;
++  return (
++    <span className="open-now">
++      Open now · until {until}
++    </span>
++  );
++}
+--- src/components/SiteHeader.tsx @24,24 SiteHeader()
+       <div className="head-right">
++        <OpenNow />
+         <AccountButton />
+=== C-011
+--- src/pages/Book.tsx @18,18 Book({ item })
+     <div className="book">
+-      <Cover item={item} size={60} />
+-      <p>{factsSentence(item)}</p>
++      <Cover item={item} size={220} />
++      <dl className="facts">
++        {facts(item).map(([k, v]) => (
++          <Fact key={k} label={k} value={v} />
++        ))}
++      </dl>
+--- src/pages/book.css @3,3
+ .book {
+   display: grid;
+-  grid-template-columns: 64px 1fr;
++  grid-template-columns: 220px 1fr;
++  gap: 36px;
+ }
+=== C-012
+--- src/components/HoldQueue.tsx @0,1
++export function HoldQueue({ item }) {
++  if (!item.out) return null;
++  const place = ordinal(item.holds + 1);
++  return (
++    <p className="queue">
++      If you place a hold now, you'll be{' '}
++      <b>{place} in line</b>. Expect to wait
++      about {estimateWait(item)}.
++    </p>
++  );
++}
+--- src/pages/Book.tsx @27,33 Book({ item })
+       <Availability item={item} />
++      <HoldQueue item={item} />
+       <HoldButton item={item} />
+=== C-013
+--- src/components/MoreByAuthor.tsx @0,1
++export function MoreByAuthor({ author }) {
++  const books = useBooksBy(author, { limit: 3 });
++  if (!books.length) return null;
++  return (
++    <section className="more">
++      <h2>More by {author}</h2>
++      <CoverRow books={books} />
++    </section>
++  );
++}
+--- src/pages/Book.tsx @35,42 Book({ item })
+     </div>
++    <MoreByAuthor author={item.author} />
+     <Summary item={item} />
+=== C-014
+--- src/pages/Book.tsx @20,25 Book({ item })
+-      <h3 className="title">{item.title}</h3>
++      <h1 className="title">{item.title}</h1>
+--- src/components/ResultsHeading.tsx @5,5
+-    <h4 className="res-h">
++    <h2 className="res-h">
+       Showing {range} of {total} results
+-    </h4>
++    </h2>
+=== C-015
+--- src/components/AccountButton.tsx @3,3
+-    <button className="icon-btn">
++    <button className="icon-btn"
++      aria-label="Your account">
+       <UserIcon />
+--- src/components/SearchBox.tsx @12,12
+-      <button type="submit" className="icon-btn">
++      <button type="submit" className="icon-btn"
++        aria-label="Search the catalogue">
+         <SearchIcon />
+=== C-016
+--- src/components/HoldButton.tsx @5,5 HoldButton({ item })
+ export function HoldButton({ item }) {
++  const [state, place] = useHold(item, {
++    onDone: (q) => toast(holdMessage(item, q)),
++  });
+   return (
+-    <form method="post" action={holdUrl(item)}>
+-      <button className="btn btn-primary">
+-        Place hold
+-      </button>
+-    </form>
++    <button className="btn btn-primary"
++      disabled={state === 'placed'}
++      onClick={place}>
++      {state === 'placed'
++        ? 'Hold placed ✓' : 'Place hold'}
++    </button>
+   );
+=== C-017
+--- server/search.ts @10,10 search(query, page)
+-  const results = await runSearch(query);
++  const key = query.trim().toLowerCase();
++  let results = cache.get(key);
++  if (!results) {
++    results = await runSearch(query);
++    cache.set(key, results, { ttl: 300 });
++  }
+   return paginate(results, page, PAGE_SIZE);
+</script>
+<script>
+(() => {
+  'use strict';
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const fmtDate = iso => { const p = iso.split('-').map(Number); return MONTHS[p[1] - 1] + ' ' + p[2]; };
+  const ordinal = n => { const t = n % 100, u = n % 10; return n + (t > 10 && t < 14 ? 'th' : u === 1 ? 'st' : u === 2 ? 'nd' : u === 3 ? 'rd' : 'th'); };
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const ICON_USER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
+  const ICON_SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+
+  const BOOKS = [
+    { id: 'mid', title: 'Middlemarch', author: 'George Eliot', year: 1871, format: 'Book', status: 'out', holds: 2, due: '2026-10-14', c1: '#6b2d3a', c2: '#f1e3c8',
+      facts: [['Format', 'Book'], ['Published', '1871'], ['Length', '880 pages'], ['Call number', 'FIC ELIOT'], ['Copies', '3, all checked out']],
+      queue: 'If you place a hold now, you’ll be <b>3rd in line</b>. A copy comes back every few days, so expect to wait about two weeks.',
+      summary: 'A portrait of a provincial English town around 1830. Dorothea Brooke, the young doctor Tertius Lydgate and their neighbours find their ambitions running into marriage, money and gossip.',
+      more: [['Silas Marner', 1861, '#45603c', '#efe6cf'], ['The Mill on the Floss', 1860, '#2c4f6e', '#e7efe9'], ['Adam Bede', 1859, '#7a4b1f', '#f3e6cf']] },
+    { id: 'moby', title: 'Moby-Dick', author: 'Herman Melville', year: 1851, format: 'Book', status: 'in', holds: 0, due: null, c1: '#1d3d5c', c2: '#e9d8a6',
+      facts: [['Format', 'Book'], ['Published', '1851'], ['Length', '720 pages'], ['Call number', 'FIC MELVILLE'], ['Copies', '3, 2 on the shelf']],
+      queue: 'Two copies are on the shelf. Place a hold and we’ll keep one at the front desk for 7 days.',
+      summary: 'Ishmael signs on to the whaler Pequod and learns that Captain Ahab means to hunt one particular white whale, whatever it costs the crew.',
+      more: [['Bartleby, the Scrivener', 1853, '#3d4a3a', '#e6e0cc'], ['Typee', 1846, '#5a3a2a', '#efdcc0'], ['Billy Budd', 1924, '#24384a', '#dfe7ee']] },
+    { id: 'frank', title: 'Frankenstein', author: 'Mary Shelley', year: 1818, format: 'eBook', status: 'in', holds: 0, due: null, c1: '#2f3b2f', c2: '#c9d6a3',
+      facts: [['Format', 'eBook'], ['Published', '1818'], ['Length', '280 pages'], ['Call number', 'Online'], ['Copies', 'No limit']],
+      queue: 'No waiting list. Place a hold and the eBook goes straight into your loans.',
+      summary: 'A young scientist gives life to a being built from dead matter, abandons it in horror, and is pursued across Europe and the Arctic by what he has made.',
+      more: [['The Last Man', 1826, '#3b3350', '#e4dcef'], ['Valperga', 1823, '#4d3b27', '#ecdcc2']] },
+    { id: 'time', title: 'The Time Machine', author: 'H. G. Wells', year: 1895, format: 'Audiobook', status: 'out', holds: 1, due: '2026-10-21', c1: '#3a2f5c', c2: '#f0c987',
+      facts: [['Format', 'Audiobook'], ['Published', '1895'], ['Length', '3 hr 25 min'], ['Call number', 'Online'], ['Copies', '2 licenses, both in use']],
+      queue: 'If you place a hold now, you’ll be <b>2nd in line</b>. Expect to wait about 10 days.',
+      summary: 'A Victorian inventor travels to the year 802,701, finds humanity split into two species, and then pushes on toward the end of the world.',
+      more: [['The War of the Worlds', 1898, '#5c2f2f', '#f0d3b5'], ['The Invisible Man', 1897, '#2f4a5c', '#dbe8ef'], ['The Island of Doctor Moreau', 1896, '#2f5c45', '#e2efd8']] },
+    { id: 'pride', title: 'Pride and Prejudice', author: 'Jane Austen', year: 1813, format: 'Book', status: 'in', holds: 0, due: null, c1: '#2e5e5a', c2: '#f4e9d8',
+      facts: [['Format', 'Book'], ['Published', '1813'], ['Length', '432 pages'], ['Call number', 'FIC AUSTEN'], ['Copies', '4, all on the shelf']],
+      queue: 'Four copies are on the shelf. Place a hold and we’ll keep one at the front desk for 7 days.',
+      summary: 'Elizabeth Bennet and the proud Mr Darcy badly misjudge each other, while her family’s future depends on how well the five Bennet sisters marry.',
+      more: [['Emma', 1815, '#5c4a2f', '#f2e4c9'], ['Persuasion', 1817, '#2f3f5c', '#dde4f0'], ['Sense and Sensibility', 1811, '#5c2f4a', '#f0d9e6']] },
+    { id: 'bleak', title: 'Bleak House', author: 'Charles Dickens', year: 1853, format: 'Book', status: 'out', holds: 0, due: '2026-10-30', c1: '#383f46', c2: '#d9d4c7',
+      facts: [['Format', 'Book'], ['Published', '1853'], ['Length', '1,036 pages'], ['Call number', 'FIC DICKENS'], ['Copies', '2, both checked out']],
+      queue: 'No one else is waiting. Place a hold and you’ll get the first copy that comes back.',
+      summary: 'An inheritance case that has dragged through the Court of Chancery for generations ties together an orphan, a lady with a secret and a crowd of London characters.',
+      more: [['Great Expectations', 1861, '#2f4f4f', '#dfeae6'], ['Little Dorrit', 1857, '#4f3f2f', '#efe2cf'], ['Our Mutual Friend', 1865, '#3f2f4f', '#e6dcef']] }
+  ];
+  const TOTALS = { All: 214, Book: 158, eBook: 37, Audiobook: 19 };
+  const EVENTS = [
+    { dow: 'Sat', day: 17, mon: 'Oct', title: 'Seed library swap', time: '10:00 am', place: 'Community room' },
+    { dow: 'Tue', day: 20, mon: 'Oct', title: 'Teen chess club', time: '4:00 pm', place: 'Study hall' },
+    { dow: 'Thu', day: 22, mon: 'Oct', title: 'Reading group: Middlemarch', time: '6:30 pm', place: 'Reading room' }
+  ];
+
+  // The change catalogue (in a real project this is review/changes.json, written by the agent as it works).
+  const CHANGES = [
+    { id: 'C-001', page: 'all', live: true, requires: [], commits: ['3f9a1c4'], origin: 'Redesign brief, section 1',
+      title: 'New page header and color palette',
+      why: 'The navy header bar and grey tables are replaced by a lighter header and one set of colors shared by buttons, badges and links.' },
+    { id: 'C-002', page: 'all', live: true, requires: [], commits: ['b72e0d9'], origin: 'Redesign brief, section 2',
+      title: 'Reading font and larger type',
+      why: 'Everything was 13px Verdana, so titles and body text looked alike. Titles now use a book serif and body text is 16px.' },
+    { id: 'C-003', page: 'catalogue', live: true, requires: [], commits: ['5d01e8a', '9e44b17'], origin: 'Usability test, finding 4',
+      title: 'Search moves to the top of the page',
+      why: 'Search was a small box in the corner of the header. On the catalogue it is now the first thing on the page, with a larger field.' },
+    { id: 'C-004', page: 'all', live: true, requires: [], commits: ['c3a90f2'], origin: 'Usability test, finding 3',
+      title: 'Availability badges',
+      why: 'Availability showed as status codes like IN and OUT (2 HLD). Each title now has a badge that says Available or Checked out, with the number of holds waiting.' },
+    { id: 'C-005', page: 'all', live: true, requires: ['C-001'], commits: ['9c41e07'], origin: 'Usability test, finding 1',
+      title: '“Place hold” button replaces the Hold link',
+      why: 'The small “Hold” link did not look clickable, and testers missed it. It is now a button that says what it does.' },
+    { id: 'C-006', page: 'catalogue', live: true, requires: ['C-004'], commits: ['17be3c5', 'a4f0d62', 'e81c9b3'], origin: 'Redesign brief, section 3',
+      title: 'Results as cards with covers',
+      why: 'Results were a dense seven-column table. They are now cards with a cover, author and availability, which scan faster and fit a phone screen.' },
+    { id: 'C-007', page: 'catalogue', live: true, requires: ['C-003'], commits: ['6a2d4e8'], origin: null,
+      title: 'Format filter chips',
+      why: 'Filtering by format meant opening Advanced search. Chips under the search box now filter by Book, eBook or Audiobook in one click.' },
+    { id: 'C-008', page: 'all', live: true, requires: [], commits: ['0e5b7a1'], origin: null,
+      title: 'Plain-language due dates',
+      why: 'Due dates appeared as 2026-10-14. They now read “Due back Oct 14”.' },
+    { id: 'C-009', page: 'catalogue', live: true, requires: [], commits: ['d9c2f60'], origin: 'Redesign brief, section 4',
+      title: 'Upcoming events strip',
+      why: 'Events were only listed on a separate page. The catalogue now shows the next three, so people looking for books also see what is on.' },
+    { id: 'C-010', page: 'all', live: true, requires: ['C-001'], commits: ['47e1b0c'], origin: null,
+      title: '“Open now” in the header',
+      why: 'Opening hours were only in the footer. The header now says whether the library is open, and until when.' },
+    { id: 'C-011', page: 'book', live: true, requires: ['C-002'], commits: ['8b3f5d2'], origin: 'Redesign brief, section 5',
+      title: 'Larger cover and a details grid',
+      why: 'The cover was a 60px thumbnail next to a run-on paragraph of details. The cover is now larger and the details sit in a labeled grid.' },
+    { id: 'C-012', page: 'book', live: true, requires: ['C-004'], commits: ['f2a6c18'], origin: 'Usability test, finding 2',
+      title: 'Explain the hold queue',
+      why: 'The page said “2 HLD” without saying what that means for you. It now says where you would be in line and roughly how long you would wait.' },
+    { id: 'C-013', page: 'book', live: true, requires: ['C-011'], commits: ['2c7d9e4'], origin: null,
+      title: 'More by this author',
+      why: 'Adds a row of the author’s other titles to the bottom of the book page.' },
+    { id: 'C-014', page: 'all', live: false, requires: ['C-002'], commits: ['b0e4a37'], origin: 'Accessibility audit, item 2',
+      title: 'One h1 per page, headings in order',
+      why: 'No page had an h1. Titles were h3 and section headings skipped levels. Each page now has one h1, and headings step down in order.',
+      reason: 'Invisible by design: headings keep their size and color. Only the HTML level changed, which screen readers and the page outline use.' },
+    { id: 'C-015', page: 'all', live: false, requires: [], commits: ['71f8c2d'], origin: 'Accessibility audit, item 5',
+      title: 'Names for icon-only buttons',
+      why: 'Screen readers announced the search and account buttons only as “button”. They are now announced as “Search the catalogue” and “Your account”.',
+      reason: 'Invisible by design (accessible names only).' },
+    { id: 'C-016', page: 'book', live: false, requires: ['C-005'], commits: ['e3d1a95', '4b8c0f7'], origin: 'Usability test, finding 5',
+      title: 'Confirm holds without reloading the page',
+      why: 'Placing a hold reloaded the page and dropped you back at the top. Now the button changes to “Hold placed” and a short message confirms it.',
+      reason: 'This changes what happens after a click. Place a hold on the stable and redesign servers to compare.' },
+    { id: 'C-017', page: 'catalogue', live: false, requires: [], commits: ['93ad6e0'], origin: null,
+      title: 'Faster paging through results',
+      why: 'Every page of results ran the whole search again. Results are now kept for a few minutes, so the next page opens straight away.',
+      reason: 'Server-side only. The page looks the same, so compare paging speed on the two servers.' }
+  ];
+  // Mock git diffs for each change's commits. A real tray would run `git show` on the commits listed in the catalogue.
+  const DIFFS = {};
+  (() => {
+    const src = document.getElementById('diffs');
+    if (!src) return;
+    let change = null, file = null;
+    src.textContent.split('\n').forEach(line => {
+      if (line.startsWith('=== ')) { change = line.slice(4).trim(); DIFFS[change] = []; file = null; return; }
+      const m = /^--- (\S+) @(\d+),(\d+)(?: (.*))?$/.exec(line);
+      if (m && change) { file = { path: m[1], at: [Number(m[2]), Number(m[3])], fn: m[4] || '', lines: [] }; DIFFS[change].push(file); return; }
+      if (file && line.length) file.lines.push(line);
+    });
+  })();
+  const byId = {};
+  const requiredBy = {};
+  CHANGES.forEach(c => { byId[c.id] = c; });
+  CHANGES.forEach(c => c.requires.forEach(r => { (requiredBy[r] = requiredBy[r] || []).push(c.id); }));
+  const cls = id => 'c' + id.slice(3);
+
+  // State. Query parameters set up a specific view (used for the screenshots); the hash carries navigation.
+  const P = new URLSearchParams(location.search);
+  const S = {
+    build: 'redesign', page: 'catalogue', book: 'mid',
+    review: P.get('review') !== '0',
+    scope: P.get('scope') === 'all' ? 'all' : 'page',
+    view: ['list', 'summary'].includes(P.get('view')) ? P.get('view') : 'detail',
+    sel: byId[P.get('sel')] ? P.get('sel') : null,
+    without: new Set((P.get('without') || '').split(',').filter(id => byId[id] && byId[id].live)),
+    decisions: {}, notes: {}, draft: null, saved: false, showJson: P.get('json') === '1',
+    format: 'All', placed: {}, reloaded: false, pendingScroll: false, diffOpen: P.get('diff') === '1'
+  };
+
+  function readHash() {
+    let h = decodeURIComponent(location.hash.slice(1));
+    if (!h) return false;
+    S.build = /^stable/.test(h) ? 'stable' : 'redesign';
+    h = h.replace(/^stable-?/, '');
+    const m = /^book-([a-z]+)$/.exec(h);
+    if (m && BOOKS.some(b => b.id === m[1])) { S.page = 'book'; S.book = m[1]; } else { S.page = 'catalogue'; }
+    return true;
+  }
+  if (!readHash()) {
+    if (P.get('build') === 'stable') S.build = 'stable';
+    if (P.get('page') === 'book') { S.page = 'book'; if (BOOKS.some(b => b.id === P.get('book'))) S.book = P.get('book'); }
+  }
+
+  const KEY = 'wrenfield-review-v1';
+  const fromParams = P.has('decide');
+  if (fromParams) {
+    P.get('decide').split(',').forEach(pair => {
+      const [id, d] = pair.split(':');
+      if (d !== 'keep' && d !== 'drop') return;
+      if (id === '*') CHANGES.forEach(c => { if (!S.decisions[c.id]) S.decisions[c.id] = d; });
+      else if (byId[id]) S.decisions[id] = d;
+    });
+  } else {
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (saved) { S.decisions = saved.decisions || {}; S.notes = saved.notes || {}; }
+    } catch (e) { /* storage unavailable: start fresh */ }
+  }
+  P.getAll('note').forEach(n => { const i = n.indexOf(':'); if (i > 0 && byId[n.slice(0, i)]) S.notes[n.slice(0, i)] = n.slice(i + 1); });
+  function persist() {
+    if (fromParams) return;
+    try { localStorage.setItem(KEY, JSON.stringify({ decisions: S.decisions, notes: S.notes })); } catch (e) { /* storage unavailable */ }
+  }
+
+  const head = $('#site-head'), main = $('#main');
+  const hrefFor = (page, book) => '#' + (S.build === 'stable' ? 'stable-' : '') + (page === 'book' ? 'book-' + book : 'catalogue');
+  const onPage = c => c.page === 'all' || c.page === S.page;
+  const scoped = () => (S.scope === 'all' ? CHANGES : CHANGES.filter(onPage));
+
+  // ---------- Site markup ----------
+  const coverHTML = (t, a, c1, c2) => '<div class="cover" style="--c1:' + c1 + ';--c2:' + c2 + '"><div class="cv"><span class="cv-t">' + esc(t) + '</span><span class="cv-a">' + esc(a) + '</span></div></div>';
+
+  function statusHTML(b) {
+    const old = b.status === 'in' ? 'IN' : 'OUT' + (b.holds ? ' (' + b.holds + ' HLD)' : '');
+    let kind = 'ok', text = 'Available';
+    if (b.status === 'out') { kind = b.holds ? 'wait' : 'out'; text = 'Checked out' + (b.holds ? ' · ' + b.holds + (b.holds === 1 ? ' hold' : ' holds') : ''); }
+    return '<span class="st-old" data-ch="C-004">' + old + '</span><span class="st-new badge ' + kind + '" data-ch="C-004">' + text + '</span>';
+  }
+  function dueHTML(b, label) {
+    if (!b.due) return '';
+    return '<span class="due"><span class="d-old" data-ch="C-008">' + (label ? 'Due: ' : '') + b.due + '</span><span class="d-new" data-ch="C-008">Due back ' + fmtDate(b.due) + '</span></span>';
+  }
+  function holdHTML(b) {
+    const placed = S.placed[b.id];
+    return '<span class="hold">' +
+      '<button type="button" class="hold-old" data-ch="C-005" data-hold="' + b.id + '">Hold</button>' +
+      '<button type="button" class="hold-new' + (placed ? ' placed' : '') + '" data-ch="C-005" data-hold="' + b.id + '"' + (placed ? ' disabled' : '') + '>' + (placed ? 'Hold placed ✓' : 'Place hold') + '</button>' +
+      '</span>';
+  }
+
+  function headerHTML() {
+    return '<div class="head-in">' +
+      '<a class="brand" href="' + hrefFor('catalogue') + '" data-ch="C-002"><span class="brand-mark" aria-hidden="true">W</span>Wrenfield Library</a>' +
+      '<nav class="nav" aria-label="Main"><a class="cur" href="' + hrefFor('catalogue') + '">Catalogue</a><a href="#" data-noop>Events</a><a href="#" data-noop>Locations</a></nav>' +
+      '<div class="head-right">' +
+        '<span class="open-now" data-ch="C-010">Open now · until 8 pm</span>' +
+        '<form class="hsearch" role="search" data-ch="C-003"><input id="q-head" value="classics" aria-label="Search the catalogue"><button type="submit">Go</button></form>' +
+        '<button type="button" class="icon-btn" data-ch="C-015" aria-label="Your account">' + ICON_USER + '</button>' +
+      '</div></div>';
+  }
+
+  function catalogueHTML() {
+    const rows = S.format === 'All' ? BOOKS : BOOKS.filter(b => b.format === S.format);
+    return (S.reloaded ? '<div class="reload-msg">Your hold request has been submitted.</div>' : '') +
+      '<h3 class="pg-title" data-ch="C-002 C-014">Catalogue search</h3>' +
+      '<p class="adv">Search: <b>classics</b> · <a href="#" data-noop>Advanced search</a></p>' +
+      '<section class="hero" data-ch="C-003">' +
+        '<h1 data-ch="C-002 C-014">Find your next book</h1>' +
+        '<form class="bigsearch" role="search"><input id="q-big" value="classics" aria-label="Search the catalogue"><button type="submit" class="icon-btn" data-ch="C-015" aria-label="Search the catalogue">' + ICON_SEARCH + '</button></form>' +
+        '<div class="chips" role="group" aria-label="Format" data-ch="C-007">' +
+          ['All', 'Book', 'eBook', 'Audiobook'].map(f => '<button type="button" class="chip" data-fmt="' + f + '" aria-pressed="' + (S.format === f) + '">' + (f === 'All' ? 'All formats' : f) + '</button>').join('') +
+        '</div>' +
+      '</section>' +
+      '<div class="res-bar"><h2 class="res-h" data-ch="C-002 C-014">Showing 1–' + rows.length + ' of ' + TOTALS[S.format] + ' results for “classics”</h2><span class="sort">Sort: Relevance</span></div>' +
+      '<div class="tscroll" data-ch="C-006"><table class="rtable"><thead><tr><th>Title</th><th>Author</th><th>Format</th><th>Year</th><th>Status</th><th>Due</th><th><span class="sr">Hold</span></th></tr></thead><tbody>' +
+        rows.map(b => '<tr><td><a href="' + hrefFor('book', b.id) + '">' + esc(b.title) + '</a></td><td>' + esc(b.author) + '</td><td>' + b.format + '</td><td>' + b.year + '</td><td>' + statusHTML(b) + '</td><td>' + (b.due ? dueHTML(b, false) : '—') + '</td><td>' + holdHTML(b) + '</td></tr>').join('') +
+      '</tbody></table></div>' +
+      '<div class="cards" data-ch="C-006">' +
+        rows.map(b => '<article class="card"><a class="cover-link" href="' + hrefFor('book', b.id) + '" tabindex="-1" aria-hidden="true">' + coverHTML(b.title, b.author, b.c1, b.c2) + '</a>' +
+          '<div class="card-body"><h3 class="card-t"><a href="' + hrefFor('book', b.id) + '">' + esc(b.title) + '</a></h3>' +
+          '<p class="card-meta">' + esc(b.author) + ' · ' + b.format + ' · ' + b.year + '</p>' +
+          '<div class="card-row">' + statusHTML(b) + dueHTML(b, true) + '</div>' +
+          '<div class="hold-row">' + holdHTML(b) + '</div></div></article>').join('') +
+      '</div>' +
+      '<nav class="pager" aria-label="Result pages" data-ch="C-017"><span>‹ Previous</span><b>Page 1 of 36</b><a href="#" data-noop>Next ›</a></nav>' +
+      '<section class="events" data-ch="C-009"><h2 class="sec-h" data-ch="C-002 C-014">This week at Wrenfield</h2><div class="ev-list">' +
+        EVENTS.map(e => '<article class="ev"><div class="ev-date"><span>' + e.dow + '</span><b>' + e.day + '</b><span>' + e.mon + '</span></div><div><div class="ev-t">' + esc(e.title) + '</div><div class="ev-m">' + e.time + ' · ' + e.place + '</div></div></article>').join('') +
+      '</div></section>';
+  }
+
+  function bookHTML() {
+    const b = BOOKS.find(x => x.id === S.book) || BOOKS[0];
+    return (S.reloaded ? '<div class="reload-msg">Your hold request has been submitted.</div>' : '') +
+      '<a class="back" href="' + hrefFor('catalogue') + '">‹ Back to results</a>' +
+      '<article class="book" data-ch="C-011">' +
+        '<div class="book-cover">' + coverHTML(b.title, b.author, b.c1, b.c2) + '</div>' +
+        '<div class="book-info">' +
+          '<h1 class="book-title" data-ch="C-002 C-014">' + esc(b.title) + '</h1>' +
+          '<p class="byline">by ' + esc(b.author) + '</p>' +
+          '<dl class="facts">' + b.facts.map(f => '<div><dt>' + f[0] + '</dt><dd>' + f[1] + '</dd></div>').join('') + '</dl>' +
+          '<p class="avail-line"><span class="lbl-old">Status:</span>' + statusHTML(b) + dueHTML(b, true) + '</p>' +
+          '<p class="queue" data-ch="C-012">' + b.queue + '</p>' +
+          '<div class="hold-wrap" data-ch="C-016">' + holdHTML(b) + '</div>' +
+        '</div>' +
+      '</article>' +
+      '<section class="more" data-ch="C-013"><h2 class="sec-h" data-ch="C-002 C-014">More by ' + esc(b.author) + '</h2><div class="more-row">' +
+        b.more.map(m => '<div class="more-item">' + coverHTML(m[0], b.author, m[2], m[3]) + '<span><b>' + esc(m[0]) + '</b><br>' + m[1] + '</span></div>').join('') +
+      '</div></section>' +
+      '<section class="desc"><h2 class="sec-h" data-ch="C-002 C-014">Summary</h2><p>' + esc(b.summary) + '</p></section>';
+  }
+
+  // ---------- Review tray ----------
+  function hunkHeader(f) {
+    let ctx = 0, add = 0, del = 0;
+    f.lines.forEach(l => { if (l[0] === '+') add++; else if (l[0] === '-') del++; else ctx++; });
+    const oc = ctx + del, nc = ctx + add;
+    return '@@ -' + (oc ? f.at[0] : 0) + ',' + oc + ' +' + f.at[1] + ',' + nc + ' @@' + (f.fn ? ' ' + f.fn : '');
+  }
+  function fileHTML(f) {
+    return '<div class="rv-file"><div class="rv-file-h"><span>' + esc(f.path) + '</span>' + (f.at[0] === 0 ? '<span class="rv-new">new file</span>' : '') + '</div>' +
+      '<pre class="rv-code"><span class="rv-code-in"><span class="ln hunk">' + esc(hunkHeader(f)) + '</span>' +
+      f.lines.map(l => '<span class="ln ' + (l[0] === '+' ? 'add' : l[0] === '-' ? 'del' : 'ctx') + '">' + esc(l) + '</span>').join('') +
+      '</span></pre></div>';
+  }
+  function diffHTML(c) {
+    const files = DIFFS[c.id] || [];
+    if (!files.length) return '';
+    let add = 0, del = 0;
+    files.forEach(f => f.lines.forEach(l => { if (l[0] === '+') add++; else if (l[0] === '-') del++; }));
+    return '<details class="rv-diff" id="rv-diff"' + (S.diffOpen ? ' open' : '') + '>' +
+      '<summary><span class="rv-diff-t">Git diff</span><span class="rv-diff-s">' + files.length + (files.length === 1 ? ' file' : ' files') +
+      ' · <span class="add">+' + add + '</span> <span class="del">−' + del + '</span></span></summary>' +
+      files.map(fileHTML).join('') + '</details>';
+  }
+  function detailHTML(c, count) {
+    const d = S.decisions[c.id] || '';
+    const rby = requiredBy[c.id] || [];
+    const deps = (c.requires.length ? 'Requires ' + c.requires.join(', ') + '. ' : '') + (rby.length ? 'Required by ' + rby.join(', ') + '.' : '');
+    const warn = [];
+    if (d === 'drop') rby.filter(x => S.decisions[x] === 'keep').forEach(x => warn.push(x + ' is marked Keep and needs this change.'));
+    if (d === 'keep') c.requires.filter(x => S.decisions[x] === 'drop').forEach(x => warn.push('Needs ' + x + ', which is marked Drop.'));
+    const note = S.draft != null ? S.draft : (S.notes[c.id] || '');
+    const off = S.without.has(c.id);
+    return '<p class="rv-eyebrow">' + c.id + ' · Drop preview: ' + (c.live ? '<span class="live">live</span>' : '<span class="np">not possible</span>') + '</p>' +
+      '<h2 class="rv-title">' + c.title + '</h2>' +
+      '<p class="rv-why">' + c.why + '</p>' +
+      '<p class="rv-small">' + (c.origin ? 'Origin: ' + c.origin + ' · ' : '') + 'Commits <span class="rv-mono">' + c.commits.join(', ') + '</span></p>' +
+      diffHTML(c) +
+      (c.live
+        ? (d === 'drop'
+          ? '<div class="rv-dropped">Dropped, so the page now shows the previous version. Choose Keep or Undecided to bring it back.</div>'
+          : '<label class="rv-switch' + (off ? ' on' : '') + '" for="rv-without"><input type="checkbox" id="rv-without"' + (off ? ' checked' : '') + '> Show the page without this change</label>')
+        : '<div class="rv-callout">Live preview is not possible for this change. ' + c.reason + '</div>' +
+          (d === 'drop' ? '<div class="rv-dropped">Dropped. The page looks the same, but the rebuild will leave this change out.</div>' : '')) +
+      (deps ? '<p class="rv-small">' + deps.trim() + '</p>' : '') +
+      warn.map(w => '<p class="rv-warn">' + w + '</p>').join('') +
+      '<p class="rv-small">' + (count ? 'Outlined on the page: ' + count + (count === 1 ? ' element.' : ' elements.') : 'Nothing to outline on this page.') + '</p>' +
+      '<div class="rv-seg" role="group" aria-label="Decision">' +
+        '<button type="button" class="k" data-dec="keep" aria-pressed="' + (d === 'keep') + '">Keep</button>' +
+        '<button type="button" class="d" data-dec="drop" aria-pressed="' + (d === 'drop') + '">Drop</button>' +
+        '<button type="button" class="u" data-dec="" aria-pressed="' + (d === '') + '">Undecided</button>' +
+      '</div>' +
+      '<label class="rv-label" for="rv-note">Note (optional)</label>' +
+      '<textarea class="rv-note" id="rv-note" rows="2">' + esc(note) + '</textarea>' +
+      '<div class="rv-noterow"><button type="button" class="rv-btn" data-act="savenote">Save note</button>' + (S.saved ? '<span class="rv-saved">Saved</span>' : '') + '</div>';
+  }
+
+  function listHTML(list) {
+    return '<ul class="rv-list">' + list.map(c => {
+      const d = S.decisions[c.id] || 'undecided';
+      return '<li><button type="button" class="rv-row" data-id="' + c.id + '" aria-current="' + (c.id === S.sel) + '"><span class="rv-chip ' + d + '">' + d + '</span><span class="rv-row-t"><b>' + c.id + '</b>' + c.title + '</span></button></li>';
+    }).join('') + '</ul>';
+  }
+
+  function planOrder(kept) {
+    const set = new Set(kept), done = new Set(), out = [];
+    const visit = id => { if (done.has(id)) return; done.add(id); byId[id].requires.filter(r => set.has(r)).forEach(visit); out.push(id); };
+    kept.slice().sort().forEach(visit);
+    return out;
+  }
+
+  function exportJSON() {
+    return JSON.stringify({
+      review: 'redesign vs stable-v3.2',
+      exported: new Date().toISOString().slice(0, 10),
+      decisions: CHANGES.map(c => ({ id: c.id, title: c.title, decision: S.decisions[c.id] || 'undecided', note: S.notes[c.id] || '' }))
+    }, null, 2);
+  }
+
+  function summaryHTML() {
+    const keep = CHANGES.filter(c => S.decisions[c.id] === 'keep').map(c => c.id);
+    const drop = CHANGES.filter(c => S.decisions[c.id] === 'drop');
+    const und = CHANGES.length - keep.length - drop.length;
+    const conflicts = [];
+    keep.forEach(id => byId[id].requires.forEach(r => { if (S.decisions[r] === 'drop') conflicts.push(id + ' needs ' + r + ', which is marked Drop.'); }));
+    let h = '<div class="rv-tally"><div class="t-keep"><b>' + keep.length + '</b>kept</div><div class="t-drop"><b>' + drop.length + '</b>dropped</div><div><b>' + und + '</b>undecided</div></div>';
+    h += '<h2 class="rv-h">Rebuild plan</h2><p class="rv-small">The agent starts a new branch from the stable tag, applies the kept changes in dependency order, and runs the tests.</p>';
+    h += '<ol class="rv-plan"><li class="base"><span>Start from <span class="rv-mono">stable-v3.2</span></span></li>' +
+      planOrder(keep).map(id => {
+        const c = byId[id];
+        const after = c.requires.filter(r => keep.includes(r));
+        return '<li><span><b class="rv-mono">' + id + '</b> ' + c.title + (after.length ? ' <em>after ' + after.join(', ') + '</em>' : '') + '</span></li>';
+      }).join('') +
+      '<li class="gate"><span>Run the tests, then open a pull request for a person to merge</span></li></ol>';
+    if (und) h += '<p class="rv-warn">' + und + ' still undecided. Decide every change before rebuilding.</p>';
+    conflicts.forEach(w => { h += '<p class="rv-warn">' + w + '</p>'; });
+    if (drop.length) h += '<h2 class="rv-h">Left out</h2><ul class="rv-out">' + drop.map(c => '<li><span><b class="rv-mono">' + c.id + '</b> ' + c.title + '</span>' + (S.notes[c.id] ? '<span class="rv-outnote">' + esc(S.notes[c.id]) + '</span>' : '') + '</li>').join('') + '</ul>';
+    h += '<div class="rv-noterow"><button type="button" class="rv-btn" data-act="export">Export decisions</button>' + (S.showJson ? '<button type="button" class="rv-btn" data-act="copy">Copy JSON</button><span class="rv-saved" id="rv-copied"></span>' : '') + '</div>';
+    if (S.showJson) h += '<pre class="rv-json" id="rv-json">' + esc(exportJSON()) + '</pre>';
+    return h;
+  }
+
+  function trayHTML(count) {
+    const list = scoped();
+    const c = byId[S.sel];
+    const i = list.indexOf(c);
+    let h = '<div class="rv-head">' +
+      '<div class="rv-row1"><span class="rv-brand">Change review</span>' +
+        '<button type="button" class="rv-btn" data-act="scope" aria-pressed="' + (S.scope === 'all') + '">All changes</button>' +
+        '<button type="button" class="rv-btn" data-act="summary" aria-pressed="' + (S.view === 'summary') + '">Summary</button></div>' +
+      (S.view === 'summary'
+        ? '<div class="rv-sumhead"><span>Decisions on all ' + CHANGES.length + ' changes</span><button type="button" class="rv-btn" data-act="summary">‹ Back to changes</button></div>'
+        : '<div class="rv-nav"><button type="button" class="rv-btn" data-act="prev">‹ Prev</button>' +
+          '<span class="rv-count">' + (i + 1) + ' of ' + list.length + (S.scope === 'all' ? ' in total' : ' on this page') + '</span>' +
+          '<button type="button" class="rv-btn" data-act="next">Next ›</button>' +
+          '<button type="button" class="rv-btn" data-act="list" aria-pressed="' + (S.view === 'list') + '">List</button></div>') +
+      '</div><div class="rv-body">';
+    if (S.view === 'summary') h += summaryHTML();
+    else { if (S.view === 'detail') h += detailHTML(c, count); h += listHTML(list); }
+    return h + '</div>';
+  }
+
+  // ---------- Outlines ----------
+  function clearOutlines() {
+    document.querySelectorAll('.rv-on').forEach(e => e.classList.remove('rv-on'));
+  }
+  function updateOutlines() {
+    clearOutlines();
+    if (!(S.build === 'redesign' && S.review && S.sel) || S.view === 'summary') return 0;
+    const els = Array.from(document.querySelectorAll('[data-ch~="' + S.sel + '"]')).filter(e => e.getClientRects().length > 0);
+    els.forEach(e => e.classList.add('rv-on'));
+    return els.length;
+  }
+  function scrollToOutline(instant) {
+    const el = document.querySelector('.rv-on');
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if (r.top >= 70 && r.bottom <= innerHeight - 30) return;
+    const top = r.top + scrollY - Math.max(80, (innerHeight - Math.min(r.height, innerHeight * .7)) / 2);
+    window.scrollTo({ top: Math.max(0, top), behavior: instant || reduced ? 'auto' : 'smooth' });
+  }
+
+  // ---------- Rendering ----------
+  function applyClasses() {
+    const list = [];
+    if (S.build === 'redesign') CHANGES.forEach(c => { if (!S.without.has(c.id) && S.decisions[c.id] !== 'drop') list.push(cls(c.id)); });
+    if (S.build === 'redesign' && S.review) list.push('rv-open');
+    document.documentElement.className = list.join(' ');
+  }
+  function renderBar() {
+    const bar = $('#buildbar');
+    const here = S.page === 'book' ? 'book-' + S.book : 'catalogue';
+    const dropped = CHANGES.filter(c => S.decisions[c.id] === 'drop').map(c => c.id);
+    if (S.build === 'stable') {
+      bar.className = 'buildbar';
+      bar.innerHTML = '<span>Stable build</span><span>Tag stable-v3.2</span><a class="switch" href="#' + here + '">Switch to redesign preview</a>';
+      return;
+    }
+    bar.className = 'buildbar rd';
+    bar.innerHTML = '<span>Redesign preview</span><span>Review build</span><span>' + CHANGES.length + ' catalogued changes</span>' +
+      (S.without.size ? '<span class="wo">Showing without ' + Array.from(S.without).join(', ') + '</span>' : '') +
+      (dropped.length ? '<span class="dr">Dropped: ' + dropped.join(', ') + '</span>' : '') +
+      '<a class="switch" href="#stable-' + here + '">Switch to stable build</a>';
+  }
+  function renderMain() { main.innerHTML = S.page === 'book' ? bookHTML() : catalogueHTML(); }
+  function renderPill() {
+    const pill = $('#rv-pill');
+    if (S.build !== 'redesign') { pill.hidden = true; return; }
+    const und = CHANGES.filter(c => !S.decisions[c.id]).length;
+    pill.hidden = false;
+    pill.innerHTML = (S.review ? 'Close review' : 'Review changes') + ' <span>' + und + ' undecided</span>';
+  }
+  function focusKey() {
+    const a = document.activeElement;
+    if (!a || !a.closest('#rv')) return null;
+    for (const k of ['data-act', 'data-dec', 'data-id']) if (a.hasAttribute(k)) return '[' + k + '="' + a.getAttribute(k) + '"]';
+    return a.id ? '#' + a.id : null;
+  }
+  function trayRender(o) {
+    o = o || {};
+    const tray = $('#rv');
+    if (!(S.build === 'redesign' && S.review)) { tray.hidden = true; tray.innerHTML = ''; clearOutlines(); renderPill(); return; }
+    const list = scoped();
+    if (!S.sel || !list.some(c => c.id === S.sel)) {
+      S.sel = list[0].id;
+      if (S.without.size) { S.without.clear(); applyClasses(); renderBar(); }
+    }
+    const n = updateOutlines();
+    const fk = focusKey();
+    const prev = tray.querySelector('.rv-body');
+    const keepTop = prev && !o.resetTray ? prev.scrollTop : 0;
+    tray.innerHTML = trayHTML(n);
+    tray.hidden = false;
+    const body = tray.querySelector('.rv-body');
+    if (body) body.scrollTop = keepTop;
+    if (fk) { const el = tray.querySelector(fk); if (el) el.focus({ preventScroll: true }); }
+    renderPill();
+    if (o.scrollPage) scrollToOutline(false);
+  }
+  function fullRender() {
+    applyClasses();
+    renderBar();
+    document.title = (S.build === 'stable' ? 'Stable · ' : 'Redesign · ') + 'Wrenfield Library';
+    head.innerHTML = headerHTML();
+    renderMain();
+    const ps = S.pendingScroll;
+    S.pendingScroll = false;
+    if (!ps) window.scrollTo(0, 0);
+    trayRender({ scrollPage: ps, resetTray: true });
+  }
+
+  // ---------- Actions ----------
+  function go(page, book) { location.hash = hrefFor(page, book); }
+  function select(id) {
+    const c = byId[id];
+    if (!c) return;
+    S.sel = id; S.draft = null; S.saved = false;
+    if (S.view !== 'detail') S.view = 'detail';
+    if (S.without.size) { S.without.clear(); applyClasses(); renderBar(); }
+    if (c.page !== 'all' && c.page !== S.page) { S.pendingScroll = true; go(c.page, S.book); return; }
+    trayRender({ scrollPage: true, resetTray: true });
+  }
+  function doAct(a) {
+    if (a === 'prev' || a === 'next') {
+      const list = scoped();
+      let i = list.findIndex(c => c.id === S.sel);
+      i = (i + (a === 'next' ? 1 : -1) + list.length) % list.length;
+      select(list[i].id);
+      return;
+    }
+    if (a === 'copy') { copyJSON(); return; }
+    if (a === 'list') S.view = S.view === 'list' ? 'detail' : 'list';
+    else if (a === 'summary') S.view = S.view === 'summary' ? 'detail' : 'summary';
+    else if (a === 'scope') S.scope = S.scope === 'all' ? 'page' : 'all';
+    else if (a === 'export') S.showJson = true;
+    else if (a === 'savenote') {
+      const v = (S.draft != null ? S.draft : (S.notes[S.sel] || '')).trim();
+      if (v) S.notes[S.sel] = v; else delete S.notes[S.sel];
+      S.draft = null; S.saved = true; persist();
+    }
+    trayRender({ resetTray: a === 'list' || a === 'summary' });
+  }
+  function setDecision(d) {
+    if (d) S.decisions[S.sel] = d; else delete S.decisions[S.sel];
+    S.without.delete(S.sel);
+    persist();
+    applyClasses();
+    renderBar();
+    trayRender();
+  }
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, 3600);
+  }
+  function placeHold(id) {
+    const b = BOOKS.find(x => x.id === id);
+    if (!b) return;
+    if (S.build === 'stable') { S.reloaded = true; renderMain(); window.scrollTo(0, 0); return; }
+    S.placed[id] = true;
+    renderMain();
+    trayRender();
+    toast('Hold placed on ' + b.title + '.' + (b.status === 'out' ? ' You’re ' + ordinal(b.holds + 1) + ' in line.' : ' We’ll keep it at the front desk for 7 days.'));
+  }
+  function copyJSON() {
+    const out = $('#rv-copied');
+    const selectText = () => {
+      const pre = $('#rv-json');
+      if (!pre) return;
+      const r = document.createRange();
+      r.selectNodeContents(pre);
+      const s = getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+      if (out) out.textContent = 'Selected. Press Ctrl+C or ⌘C to copy.';
+    };
+    try { navigator.clipboard.writeText(exportJSON()).then(() => { if (out) out.textContent = 'Copied'; }, selectText); } catch (e) { selectText(); }
+  }
+
+  document.addEventListener('click', e => {
+    if (e.target.closest('[data-noop]')) { e.preventDefault(); return; }
+    const hold = e.target.closest('[data-hold]');
+    if (hold) { placeHold(hold.getAttribute('data-hold')); return; }
+    const fmt = e.target.closest('[data-fmt]');
+    if (fmt) { S.format = fmt.getAttribute('data-fmt'); renderMain(); trayRender(); return; }
+    const row = e.target.closest('[data-id]');
+    if (row) { select(row.getAttribute('data-id')); return; }
+    const dec = e.target.closest('[data-dec]');
+    if (dec) { setDecision(dec.getAttribute('data-dec')); return; }
+    const act = e.target.closest('[data-act]');
+    if (act) { doAct(act.getAttribute('data-act')); return; }
+    if (e.target.closest('#rv-pill')) { S.review = !S.review; applyClasses(); trayRender({ resetTray: true }); }
+  });
+  document.addEventListener('change', e => {
+    if (e.target.id !== 'rv-without') return;
+    if (e.target.checked) S.without.add(S.sel); else S.without.delete(S.sel);
+    applyClasses();
+    renderBar();
+    trayRender();
+  });
+  document.addEventListener('input', e => {
+    if (e.target.id !== 'rv-note') return;
+    S.draft = e.target.value;
+    if (S.saved) { S.saved = false; const s = $('#rv .rv-noterow .rv-saved'); if (s) s.remove(); }
+  });
+  document.addEventListener('toggle', e => { if (e.target && e.target.id === 'rv-diff') S.diffOpen = e.target.open; }, true);
+  document.addEventListener('submit', e => e.preventDefault());
+  addEventListener('hashchange', () => {
+    const before = S.build;
+    if (!readHash()) return;
+    if (S.build !== before) S.without.clear();
+    S.reloaded = false;
+    fullRender();
+  });
+  let raf = 0;
+  addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(updateOutlines); });
+
+  fullRender();
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => {
+    updateOutlines();
+    if (P.get('noscroll') !== '1') scrollToOutline(true);
+    if (P.has('y')) window.scrollTo(0, Number(P.get('y')) || 0);
+    updateOutlines();
+  });
+})();
+</script>
+</body>
+</html>

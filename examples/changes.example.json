@@ -1,0 +1,291 @@
+{
+  "project": "Wrenfield Library (fictional demo)",
+  "base": "stable-v3.2",
+  "branch": "redesign",
+  "changes": [
+    {
+      "id": "C-001",
+      "title": "New page header and color palette",
+      "what_why": "The navy header bar and grey tables are replaced by a lighter header and one set of colors shared by buttons, badges and links.",
+      "pages": [
+        "catalogue",
+        "book"
+      ],
+      "element": "[data-ch~='C-001']",
+      "commits": [
+        "3f9a1c4"
+      ],
+      "depends_on": [],
+      "live_preview": true,
+      "origin": "Redesign brief, section 1"
+    },
+    {
+      "id": "C-002",
+      "title": "Reading font and larger type",
+      "what_why": "Everything was 13px Verdana, so titles and body text looked alike. Titles now use a book serif and body text is 16px.",
+      "pages": [
+        "catalogue",
+        "book"
+      ],
+      "element": "[data-ch~='C-002']",
+      "commits": [
+        "b72e0d9"
+      ],
+      "depends_on": [],
+      "live_preview": true,
+      "origin": "Redesign brief, section 2"
+    },
+    {
+      "id": "C-003",
+      "title": "Search moves to the top of the page",
+      "what_why": "Search was a small box in the corner of the header. On the catalogue it is now the first thing on the page, with a larger field.",
+      "pages": [
+        "catalogue"
+      ],
+      "element": "[data-ch~='C-003']",
+      "commits": [
+        "5d01e8a",
+        "9e44b17"
+      ],
+      "depends_on": [],
+      "live_preview": true,
+      "origin": "Usability test, finding 4"
+    },
+    {
+      "id": "C-004",
+      "title": "Availability badges",
+      "what_why": "Availability showed as status codes like IN and OUT (2 HLD). Each title now has a badge that says Available or Checked out, with the number of holds waiting.",
+      "pages": [
+        "catalogue",
+        "book"
+      ],
+      "element": "[data-ch~='C-004']",
+      "commits": [
+        "c3a90f2"
+      ],
+      "depends_on": [],
+      "live_preview": true,
+      "origin": "Usability test, finding 3"
+    },
+    {
+      "id": "C-005",
+      "title": "“Place hold” button replaces the Hold link",
+      "what_why": "The small “Hold” link did not look clickable, and testers missed it. It is now a button that says what it does.",
+      "pages": [
+        "catalogue",
+        "book"
+      ],
+      "element": "[data-ch~='C-005']",
+      "commits": [
+        "9c41e07"
+      ],
+      "depends_on": [
+        "C-001"
+      ],
+      "live_preview": true,
+      "origin": "Usability test, finding 1"
+    },
+    {
+      "id": "C-006",
+      "title": "Results as cards with covers",
+      "what_why": "Results were a dense seven-column table. They are now cards with a cover, author and availability, which scan faster and fit a phone screen.",
+      "pages": [
+        "catalogue"
+      ],
+      "element": "[data-ch~='C-006']",
+      "commits": [
+        "17be3c5",
+        "a4f0d62",
+        "e81c9b3"
+      ],
+      "depends_on": [
+        "C-004"
+      ],
+      "live_preview": true,
+      "origin": "Redesign brief, section 3"
+    },
+    {
+      "id": "C-007",
+      "title": "Format filter chips",
+      "what_why": "Filtering by format meant opening Advanced search. Chips under the search box now filter by Book, eBook or Audiobook in one click.",
+      "pages": [
+        "catalogue"
+      ],
+      "element": "[data-ch~='C-007']",
+      "commits": [
+        "6a2d4e8"
+      ],
+      "depends_on": [
+        "C-003"
+      ],
+      "live_preview": true
+    },
+    {
+      "id": "C-008",
+      "title": "Plain-language due dates",
+      "what_why": "Due dates appeared as 2026-10-14. They now read “Due back Oct 14”.",
+      "pages": [
+        "catalogue",
+        "book"
+      ],
+      "element": "[data-ch~='C-008']",
+      "commits": [
+        "0e5b7a1"
+      ],
+      "depends_on": [],
+      "live_preview": true
+    },
+    {
+      "id": "C-009",
+      "title": "Upcoming events strip",
+      "what_why": "Events were only listed on a separate page. The catalogue now shows the next three, so people looking for books also see what is on.",
+      "pages": [
+        "catalogue"
+      ],
+      "element": "[data-ch~='C-009']",
+      "commits": [
+        "d9c2f60"
+      ],
+      "depends_on": [],
+      "live_preview": true,
+      "origin": "Redesign brief, section 4"
+    },
+    {
+      "id": "C-010",
+      "title": "“Open now” in the header",
+      "what_why": "Opening hours were only in the footer. The header now says whether the library is open, and until when.",
+      "pages": [
+        "catalogue",
+        "book"
+      ],
+      "element": "[data-ch~='C-010']",
+      "commits": [
+        "47e1b0c"
+      ],
+      "depends_on": [
+        "C-001"
+      ],
+      "live_preview": true
+    },
+    {
+      "id": "C-011",
+      "title": "Larger cover and a details grid",
+      "what_why": "The cover was a 60px thumbnail next to a run-on paragraph of details. The cover is now larger and the details sit in a labeled grid.",
+      "pages": [
+        "book"
+      ],
+      "element": "[data-ch~='C-011']",
+      "commits": [
+        "8b3f5d2"
+      ],
+      "depends_on": [
+        "C-002"
+      ],
+      "live_preview": true,
+      "origin": "Redesign brief, section 5"
+    },
+    {
+      "id": "C-012",
+      "title": "Explain the hold queue",
+      "what_why": "The page said “2 HLD” without saying what that means for you. It now says where you would be in line and roughly how long you would wait.",
+      "pages": [
+        "book"
+      ],
+      "element": "[data-ch~='C-012']",
+      "commits": [
+        "f2a6c18"
+      ],
+      "depends_on": [
+        "C-004"
+      ],
+      "live_preview": true,
+      "origin": "Usability test, finding 2"
+    },
+    {
+      "id": "C-013",
+      "title": "More by this author",
+      "what_why": "Adds a row of the author’s other titles to the bottom of the book page.",
+      "pages": [
+        "book"
+      ],
+      "element": "[data-ch~='C-013']",
+      "commits": [
+        "2c7d9e4"
+      ],
+      "depends_on": [
+        "C-011"
+      ],
+      "live_preview": true
+    },
+    {
+      "id": "C-014",
+      "title": "One h1 per page, headings in order",
+      "what_why": "No page had an h1. Titles were h3 and section headings skipped levels. Each page now has one h1, and headings step down in order.",
+      "pages": [
+        "catalogue",
+        "book"
+      ],
+      "element": "[data-ch~='C-014']",
+      "commits": [
+        "b0e4a37"
+      ],
+      "depends_on": [
+        "C-002"
+      ],
+      "live_preview": false,
+      "no_preview_reason": "Invisible by design: headings keep their size and color. Only the HTML level changed, which screen readers and the page outline use.",
+      "origin": "Accessibility audit, item 2"
+    },
+    {
+      "id": "C-015",
+      "title": "Names for icon-only buttons",
+      "what_why": "Screen readers announced the search and account buttons only as “button”. They are now announced as “Search the catalogue” and “Your account”.",
+      "pages": [
+        "catalogue",
+        "book"
+      ],
+      "element": "[data-ch~='C-015']",
+      "commits": [
+        "71f8c2d"
+      ],
+      "depends_on": [],
+      "live_preview": false,
+      "no_preview_reason": "Invisible by design (accessible names only).",
+      "origin": "Accessibility audit, item 5"
+    },
+    {
+      "id": "C-016",
+      "title": "Confirm holds without reloading the page",
+      "what_why": "Placing a hold reloaded the page and dropped you back at the top. Now the button changes to “Hold placed” and a short message confirms it.",
+      "pages": [
+        "book"
+      ],
+      "element": "[data-ch~='C-016']",
+      "commits": [
+        "e3d1a95",
+        "4b8c0f7"
+      ],
+      "depends_on": [
+        "C-005"
+      ],
+      "live_preview": false,
+      "no_preview_reason": "This changes what happens after a click. Place a hold on the stable and redesign servers to compare.",
+      "origin": "Usability test, finding 5"
+    },
+    {
+      "id": "C-017",
+      "title": "Faster paging through results",
+      "what_why": "Every page of results ran the whole search again. Results are now kept for a few minutes, so the next page opens straight away.",
+      "pages": [
+        "catalogue"
+      ],
+      "element": "[data-ch~='C-017']",
+      "commits": [
+        "93ad6e0"
+      ],
+      "depends_on": [],
+      "live_preview": false,
+      "no_preview_reason": "Server-side only. The page looks the same, so compare paging speed on the two servers."
+    }
+  ]
+}
