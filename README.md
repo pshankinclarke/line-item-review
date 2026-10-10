@@ -1,28 +1,37 @@
 # Line-Item Review
 
-A workflow for reviewing an AI agent's UI work one change at a time. Each change has a name and a reason, you can see it in the running app, and you keep or drop it on its own.
+A workflow for reviewing an AI agent's UI work one change at a time. Each change has a name and a reason, and you see it in the running app, where you keep or drop it. **[Try the demo site](https://pshankinclarke.github.io/line-item-review/demo/)**
 
-> **Made with Claude Opus 5.5.** The workflow and the results are mine. Claude Opus 5.5, Anthropic's AI model, wrote this write-up and built the demo site, its screenshots, the mock git diffs and the example catalogue, working from my notes and feedback. See [How this was made](#how-this-was-made).
+> **Made with Claude Opus 5.5.** Anthropic's Claude Opus 5.5 created this write-up and built the demo site, its screenshots, the mock git diffs and the example catalogue, working from my notes and feedback. See [How this was made](#how-this-was-made).
 
 ![The review tray on the demo site. Change C-005 is selected, and the six “Place hold” buttons it added are outlined in amber.](docs/shots/review-tray.png)
 
-**[Read the illustrated write-up](https://pshankinclarke.github.io/line-item-review/) · [Try the demo site](https://pshankinclarke.github.io/line-item-review/demo/)**
+**[Read the illustrated write-up](https://pshankinclarke.github.io/line-item-review/)**
 
-The screenshots come from Wrenfield Library, a made-up library catalogue in [`docs/demo/`](docs/demo/index.html). It has 17 catalogued changes and a working review tray.
+The screenshots come from Wrenfield Library, a made-up library catalogue in [`docs/demo/`](docs/demo/index.html).
 
 ## The problem
 
-Coding agents are good at UI work, and they are prolific. Ask for a redesign and you get back a branch with fifty or eighty changes: spacing, copy, layout, new components, removed ones, a reworked form.
+Coding agents are as good as they are prolific at UI work. Ask for a redesign and you get back a branch with fifty or eighty changes: spacing, copy, layout, new components, removed ones, a reworked form.
 
 Reviewing that branch leaves two bad options. You can accept or reject the whole thing, which throws away good work along with the bad. Or you can read the code diff, which is slow and still doesn't show you what each change looks like or why the agent made it.
 
-I wanted a third option: see every change in the running app, understand it in plain language, and decide on each one separately.
+I wanted a third option: see every change in the running app, understand it in plain language, and exercise line-item veto by deciding on each change separately.
+
+## How it has held up
+
+| App | Changes catalogued by the agent | Changes that could be previewed on the page |
+| --- | ---: | ---: |
+| Mapping web app | 84 | 76 |
+| Workspace dashboard | 48 | 23 |
+
+The first column counts the changes the agent catalogued for me to review. The second column counts how many of those could be previewed visually in the app. At that size, reviewing the whole branch at once isn’t realistic. With a catalogue, each decision is small.
 
 ## How it works
 
 ### 1. The agent keeps a change catalogue
 
-Every change the agent makes gets an entry in one file, such as `review/changes.json`. Each entry has an ID, a title, a plain-language note on what changed and why, the pages and element it affects, the commits that make it up, and the other changes it depends on.
+Every change the agent makes gets an entry in one file, such as `review/changes.json`. Each entry has an ID, a title, a note on what changed and why, the pages and element it affects, the commits that make it up, and the other changes it depends on.
 
 ```json
 {
@@ -48,16 +57,6 @@ The preview build of the app gets a review tray. It's off by default and never s
 The catalogue already lists each change's commits, so the card can also show their git diff. The plain-language reason and the code that implements it sit on the same card.
 
 <p><img src="docs/shots/change-card.png" width="380" alt="The change card for C-005 with its git diff open: HoldButton.tsx swaps a link for a button inside a form, and a new buttons.css file adds the button styles."></p>
-
-Each card shows:
-
-- the ID, and whether the change can be previewed live
-- a title and a plain-language note on what changed and why
-- where the change came from, and its commits
-- the git diff for those commits, folded away until you open it
-- a **Show without** switch, or the reason there isn't one
-- what the change depends on, and what depends on it
-- Keep, Drop or Undecided, with an optional note
 
 ### 3. Keep or Drop, one change at a time
 
@@ -90,29 +89,6 @@ Two copies of the app run at the same time on separate local ports: the last sta
 Once every change has a decision, the agent doesn't edit the redesign branch. It starts a fresh branch from the stable tag and applies only the kept changes, in dependency order, with tests. Nothing merges until a person has reviewed the result and merged it.
 
 <p><img src="docs/shots/summary.png" width="300" alt="The tray's summary: 14 changes kept, 3 dropped with notes, and a numbered rebuild plan that starts from the stable tag."></p>
-
-- Dropped changes never enter the new branch, so there is nothing to revert.
-- Dependencies are in the catalogue, so a kept change that needs a dropped one is caught before the rebuild starts.
-- The reasons for dropping travel with the decisions.
-- The result is an ordinary pull request, and a person merges it.
-
-## How it has held up
-
-| App | Changes catalogued | Live preview in the tray |
-| --- | ---: | ---: |
-| First app | 84 | 48 |
-| Second app | 76 | not recorded |
-
-At that size, reviewing the whole branch at once isn't realistic. With a catalogue, each decision is small: one change, one page, one reason.
-
-## Why it's worth the setup
-
-Every change the agent makes is named, explained, traceable to its commits, and individually vetoable.
-
-- **Review happens where the change is visible**, in the running app instead of the diff.
-- **Good work survives bad work.** One unwanted change no longer sinks the other eighty.
-- **The catalogue becomes an audit trail.** Months later you can still see what the agent changed, why, and who approved it.
-- **A person stays the merge gate.** The agent proposes and rebuilds. You decide and merge.
 
 ## Trying it yourself
 
